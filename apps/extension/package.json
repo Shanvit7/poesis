@@ -1,0 +1,35 @@
+{
+  "name": "@supatube/extension",
+  "displayName": "SupaTube",
+  "version": "0.0.1",
+  "description": "Remember what you actually learn on YouTube",
+  "private": true,
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "lint": "biome check ."
+  },
+  "dependencies": {
+    "plasmo": "^0.89.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@plasmohq/prettier-plugin-sort-imports": "^4.0.1",
+    "@types/chrome": "^0.0.308",
+    "@types/node": "^22.15.3",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "typescript": "^5.8.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://www.youtube.com/*"
+    ],
+    "permissions": [
+      "storage",
+      "tabs",
+      "activeTab"
+    ]
+  }
+}
