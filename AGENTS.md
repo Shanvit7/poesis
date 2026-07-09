@@ -49,11 +49,8 @@ This file documents the conventions enforced by Biome (linter/formatter) and oth
 
 ### Constants & Environment
 
-- All env-derived values go in `packages/core/src/constants.ts` and are imported via `@/constants`
-- Current constants:
-  - **`IS_DEV`** — `process.env.NODE_ENV !== 'production'`
-  - **`LOG_LEVEL`** — `process.env.LOG_LEVEL \|\| 'info'`
-- Never inline `process.env.*` checks — add a named constant in `@/constants` and re-export it from `index.ts`
+- All env-derived values go in `apps/web/src/constants.ts` and are imported via `@/constants`
+- Never inline `process.env.*` checks — add a named constant in `@/constants`
 
 ### Biome
 
@@ -74,27 +71,6 @@ This file documents the conventions enforced by Biome (linter/formatter) and oth
 - Module: `ESNext`, resolution: `bundler`
 - Path aliases configured per-package in their own `tsconfig.json`
 - Build: `tsc && tsc-alias` (rewrites `@/*` → relative paths in output)
-
-### Packages
-
-| Package | Path |
-|---------|------|
-| `@stan0/core` | [`packages/core/`](./packages/core) |
-| `@stan0/db` | [`packages/db/`](./packages/db) |
-
-### Database Migrations (`packages/db`)
-
-Drizzle Kit auto-generates random migration names (e.g. `0003_motionless_tyrannus`).
-**Always rename them to descriptive names** before committing.
-
-```bash
-cd packages/db/migrations
-mv 0003_motionless_tyrannus.sql 0003_add_onboarded_at.sql
-# Update meta/_journal.json "tag" field to match
-```
-
-Format: `<sequence>_<snake_case_description>.sql`
-Examples: `0001_add_demo_jobs.sql`, `0002_add_sse_conversation.sql`
 
 ---
 
@@ -142,17 +118,14 @@ Never call `fetch` directly inside a component or hook.
 
 - ES6 class that owns the API calls for one domain.
 - Instantiates `ApiService` from `@/services/index` (never raw `fetch`).
-- Uses `createLogger` from `@stan0/core` for structured logging.
 - Throws typed domain errors (e.g. `WaitlistError`) so TanStack Query can surface them.
 - Exports a singleton instance **and** `mutationOptions` / `queryOptions` helpers.
 
 ```ts
-import { createLogger } from '@stan0/core';
 import { mutationOptions } from '@tanstack/react-query';
 import { ApiService } from '@/services/index';
 import { TAGS } from '@/services/tags';
 
-const logger = createLogger('example-service');
 const api = new ApiService();
 
 export class ExampleService {
