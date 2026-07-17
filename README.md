@@ -2,7 +2,7 @@
   <img src="apps/web/src/app/icon.svg" width="72" alt="Poiesis logo" />
   <h1 align="center">Poiesis</h1>
   <p align="center">
-    <a href="https://github.com/Shanvit7/poeisis/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-C62C5A?style=flat-square" alt="License: MIT" /></a>
+    <a href="https://github.com/Shanvit7/poesis/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-C62C5A?style=flat-square" alt="License: MIT" /></a>
     <img src="https://img.shields.io/badge/status-early_access-C62C5A?style=flat-square" alt="Status" />
     <a href="https://aistudio.google.com/app/apikey"><img src="https://img.shields.io/badge/requires-Gemini_API-4285F4?style=flat-square&logo=google&logoColor=white" alt="Requires Gemini" /></a>
   </p>

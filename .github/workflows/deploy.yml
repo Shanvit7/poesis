@@ -35,7 +35,7 @@ jobs:
       - name: Build
         run: pnpm --filter @poiesis/web build
         env:
-          NEXT_PUBLIC_BASE_PATH: /poeisis
+          NEXT_PUBLIC_BASE_PATH: /poesis
 
       - run: touch apps/web/out/.nojekyll
 
