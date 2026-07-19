@@ -125,25 +125,6 @@ export const checkOffChapter = (projectDir: string, chapter: number, kind: Chapt
   writeFile(path, JSON.stringify(roadmap, null, 2))
 }
 
-// ── detectTestSetup ────────────────────────────────────────────────────────────
-
-/**
- * Infer the right test extension + runner from chapter text AND user stack.
- * Reads both so a TS-stack user doing a Rust chapter still gets cargo test.
- */
-export const detectTestSetup = (
-  chapterMd: string,
-  primaryStack: string[]
-): { ext: string; runner: string } => {
-  const fp = [...primaryStack, chapterMd].join(" ").toLowerCase()
-  if (/\brust\b|axum|cargo|tokio/.test(fp)) return { ext: "rs", runner: "cargo test" }
-  if (/\bgo\b|golang|\bgin\b|\bfiber\b/.test(fp)) return { ext: "go", runner: "go test ./..." }
-  if (/\bpython\b|pytest|fastapi|django|flask/.test(fp)) return { ext: "py", runner: "pytest" }
-  return { ext: "ts", runner: "npx vitest run" } // ponytail: default — covers TS/JS, Hono, Express, React
-}
-
-// ── chapterPrompt ────────────────────────────────────────────────────────────
-
 /**
  * Build the LLM injection for a chapter session.
  *
@@ -161,8 +142,6 @@ export const chapterPrompt = (
   chapterMd: string,
   kind: ChapterKind,
   chapterNum: number,
-  testsFile: string | null,
-  runner: string,
   techstackMd = "",
   primaryStack: string[] = [],
   recentProjects: RecentProject[] = []
@@ -235,10 +214,12 @@ If the tool returns "add": ask the student what to add, then re-call with the up
 If "skip": ask which one, then re-call without it.
 
 **Step 4 — Write the test file**
-Once confirmed, write \`${testsFile}\` yourself using the write tool.
+Based on the chapter's tech stack, choose the right test framework and an appropriate file path
+(e.g. \`tests/chapter-N.test.ts\` + vitest for TS, \`tests/test_chapter_N.py\` + pytest, etc.).
+Write the test file yourself using the write tool.
 Name tests after behaviour: \`server_returns_200_on_root\` not \`test_server\`.
 No mocking unless I/O is the point.
-After writing: "Done — \`${testsFile}\` is our contract. Let's make these pass."
+After writing: "Done — <your test file> is our contract. Let's make these pass."
 
 **Step 5 — YOU implement. Student is HITL for decisions + wrong-answer TDD.**
 
@@ -263,11 +244,11 @@ After writing: "Done — \`${testsFile}\` is our contract. Let's make these pass
 
 6. If a command fails 3 times: THEN explain and ask the student. Otherwise handle silently.
 
-Your code MUST make \`${testsFile}\` pass. Don't modify the test file.
+Your code MUST make the test file you wrote pass. Don't modify the test file.
 If a test seems wrong: raise it via ask_user_question before touching it.
 
 **Step 6 — Run & complete**
-Call \`poiesis_run_tests\` with chapter=${chapterNum} and cmd=\"${runner} ${testsFile ?? ""}\".
+Call \`poiesis_run_tests\` with chapter=${chapterNum} and cmd="<the runner + test file you chose>".
 Fail → YOU diagnose + fix + re-run. No student involvement unless stuck after 3 attempts.
 Pass → call \`poiesis_chapter_done\`.
 `
@@ -344,10 +325,8 @@ export const runChapter = async (
     // ponytail: fall back to 'code' if Gemini is unavailable
   }
 
-  const { ext, runner } = detectTestSetup(chapterMd, profile.primaryStack)
-  const testsFile = kind !== "theory" ? `tests/chapter-${n}.test.${ext}` : null
-
-  setChapterMeta(projectDir, n, kind, testsFile)
+  // pi decides the test file and runner from context — no heuristic here
+  setChapterMeta(projectDir, n, kind, null)
   ctx.ui.setStatus("poiesis", undefined)
 
   // Read techstack.md — lets the agent know the runtime/PM/framework without asking
@@ -358,8 +337,6 @@ export const runChapter = async (
     chapterMd,
     kind,
     n,
-    testsFile,
-    runner,
     techstackMd,
     profile.primaryStack,
     profile.recentProjects
@@ -424,32 +401,11 @@ if (process.argv[1]?.endsWith("chapter.ts")) {
     const withReflection = readFile(join(chDir, "chapter-1.md"))
     console.assert(withReflection.includes("## Reflection"), "reflection section missing")
 
-    // detectTestSetup
-    console.assert(
-      detectTestSetup("uses hono and TypeScript", ["TypeScript"]).ext === "ts",
-      "hono → ts"
-    )
-    console.assert(
-      detectTestSetup("build an axum server", ["TypeScript"]).ext === "rs",
-      "axum → rs"
-    )
-    console.assert(detectTestSetup("fastapi endpoints", ["Python"]).ext === "py", "fastapi → py")
-    console.assert(detectTestSetup("gin router", ["Go"]).runner === "go test ./...", "gin → go")
-
     // chapterPrompt — code chapter with profile context
     const testProjects = [
       { name: "hono-api", summary: "REST API with Hono", stack: ["TypeScript", "Hono"] },
     ]
-    const prompt = chapterPrompt(
-      "# Ch1\nContent.",
-      "code",
-      1,
-      "tests/ch1.test.ts",
-      "npx vitest run",
-      "",
-      ["TypeScript"],
-      testProjects
-    )
+    const prompt = chapterPrompt("# Ch1\nContent.", "code", 1, "", ["TypeScript"], testProjects)
     // Step 0 — prerequisite gate
     console.assert(prompt.includes("Prerequisite gate"), "Step 0 gate missing")
     console.assert(prompt.includes("FAMILIAR"), "FAMILIAR path missing")
@@ -474,7 +430,7 @@ if (process.argv[1]?.endsWith("chapter.ts")) {
     // experienceLevel must NOT be statically baked in
     console.assert(!prompt.includes("experienceLevel"), "experienceLevel must not appear in prompt")
     // theory chapter
-    const theoryPrompt = chapterPrompt("# Ch2\nConcepts.", "theory", 2, null, "", "", ["Go"], [])
+    const theoryPrompt = chapterPrompt("# Ch2\nConcepts.", "theory", 2, "", ["Go"], [])
     console.assert(
       !theoryPrompt.includes("test file"),
       "test file must not appear in theory prompt"
