@@ -37,6 +37,9 @@ importers:
       '@google/genai':
         specifier: ^1.0.0
         version: 1.52.0
+      '@juicesharp/rpiv-ask-user-question':
+        specifier: '*'
+        version: 1.20.0(@earendil-works/pi-coding-agent@0.80.10(ws@8.21.1)(zod@3.25.76))(@earendil-works/pi-tui@0.80.10)(typebox@1.3.6)
       typebox:
         specifier: '*'
         version: 1.3.6
@@ -420,6 +423,22 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@juicesharp/rpiv-ask-user-question@1.20.0':
+    resolution: {integrity: sha512-nccqKqeKoMDO9EZtAotyA/OkHBj+tl2jJBBSpP+1Ndyf7fnU592AO8Ax2Xk9VywHOYVz2X/66d/wC3oFUekV5Q==}
+    peerDependencies:
+      '@earendil-works/pi-coding-agent': '*'
+      '@earendil-works/pi-tui': '*'
+      '@juicesharp/rpiv-i18n': '*'
+      typebox: '*'
+    peerDependenciesMeta:
+      '@juicesharp/rpiv-i18n':
+        optional: true
+
+  '@juicesharp/rpiv-config@1.20.0':
+    resolution: {integrity: sha512-eu/sEBDt/+9kP40yCtlu04kRUxkQNaG1APzNIgnt5dGsualcwruedLWX9vtt0Fg4NSCAlNx5b2r9VjcWgAJirQ==}
+    peerDependencies:
+      typebox: '*'
 
   '@mariozechner/clipboard-darwin-arm64@0.3.9':
     resolution: {integrity: sha512-BfgV7vCEWZwJwZJw03r6bP5+tf0iI/ANuQYCxi9RNn7FrWB3yzGuMKCrNLRl6V761vXRdL8+OqZ0wd4TqlsNOQ==}
@@ -2059,6 +2078,17 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@juicesharp/rpiv-ask-user-question@1.20.0(@earendil-works/pi-coding-agent@0.80.10(ws@8.21.1)(zod@3.25.76))(@earendil-works/pi-tui@0.80.10)(typebox@1.3.6)':
+    dependencies:
+      '@earendil-works/pi-coding-agent': 0.80.10(ws@8.21.1)(zod@3.25.76)
+      '@earendil-works/pi-tui': 0.80.10
+      '@juicesharp/rpiv-config': 1.20.0(typebox@1.3.6)
+      typebox: 1.3.6
+
+  '@juicesharp/rpiv-config@1.20.0(typebox@1.3.6)':
+    dependencies:
+      typebox: 1.3.6
 
   '@mariozechner/clipboard-darwin-arm64@0.3.9':
     optional: true

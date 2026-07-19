@@ -1,8 +1,8 @@
 # @shanvit7/poiesis
 
-A [pi](https://pi.earendil.works) extension that turns any YouTube coding tutorial into a **guided, hands-on build session**.
+A [pi](https://pi.earendil.works) extension that turns any YouTube coding tutorial into a hands-on, test-driven build session.
 
-Pi reads the video deeply, grills you on what you want out of it, then codes through it chapter by chapter — explaining every decision, flagging outdated patterns, and making sure you actually understand what's being built.
+Pi reads the video, profiles your existing experience, and codes through it chapter by chapter — running every step itself, explaining each decision, and making sure you understand what's being built and why.
 
 ---
 
@@ -12,7 +12,7 @@ Pi reads the video deeply, grills you on what you want out of it, then codes thr
 pi install npm:@shanvit7/poiesis
 ```
 
-You'll also need a free Gemini API key — get one at https://aistudio.google.com/app/apikey — then add it to your shell:
+Requires a free Gemini API key — get one at [aistudio.google.com](https://aistudio.google.com/app/apikey):
 
 ```bash
 export GEMINI_API_KEY=your-key-here
@@ -22,123 +22,94 @@ export GEMINI_API_KEY=your-key-here
 
 ## Usage
 
-```
-/poiesis <youtube-url>   →  ingest the video, pi becomes your tutor
-/poiesis build           →  scaffold a local repo, generate chapter lab guides, start the lab
-/poiesis whoami          →  rescan your local projects + GitHub to refresh your profile
-```
-
-### Workflow
+Everything runs through one command:
 
 ```bash
-# 1. Feed pi a coding tutorial
-/poiesis https://www.youtube.com/watch?v=...
-
-# pi reads the video deeply (transcripts, chapters, stack, key concepts).
-# Then the tutor session begins — pi will:
-#   - Ask where to create the project
-#   - Recommend or push back on stack choices
-#   - Flag chapters that teach outdated patterns
-#   - Tell you which chapters are worth doing vs. skipping
-
-# 2. When you're aligned, kick off the lab
-/poiesis build
-
-# pi asks 3 quick questions (stack, depth, skip which chapters?),
-# scaffolds a local repo, and generates a chapter-by-chapter lab guide.
-# Pi codes through each chapter in chat. You follow along and understand.
+/poiesis
 ```
+
+Pi decides what to do based on context:
+
+| Situation | What happens |
+|-----------|-------------|
+| No profile yet | Onboarding — pi scans your GitHub and asks a few questions to build your profile |
+| Profile exists, no active project | Pi asks for a YouTube URL, analyzes the video with Gemini, and scaffolds a project |
+| Inside an active project | Pi resumes the chapter session from where you left off |
 
 ---
 
-## What gets created
+## What a session looks like
 
-Project is placed wherever you chose during the tutor session (defaults to `<cwd>/<slug>`).
+### Onboarding
+
+Pi scans your GitHub repos (or you describe your projects if preferred) to understand your stack and background. This calibrates every chapter going forward — what to explain, what to skip, and how deep to go.
+
+Profile is saved to `~/.poiesis/user-profile.json`.
+
+### Project setup
+
+Paste a YouTube URL. Pi uses Gemini to analyze the video — chapters, tech stack, concepts, and key takeaways — then scaffolds a project directory:
 
 ```
-<chosen-path>/
-  docs/
-    chapter-01-getting-started.md   ← lab guide: concepts, exercises, tutor notes
-    chapter-02-auth.md
-    ...
-  POIESIS.md                        ← manifest with video timestamp links
-  <your code as you build it>
+<project-name>/
+  .poiesis/
+    chapters/
+      .progress.json        <- tracks current chapter and test status
+      chapter-index.md      <- video overview and chapter map
+      chapter-1.md          <- concepts, learning goals, tutor notes
+      chapter-2.md
+      ...
+  .gitignore
 ```
 
-Each chapter guide includes:
-- **What you'll build** — concrete outcome
-- **Key concepts** — patterns, not just topic names
-- **Lab exercises** — specific enough to know when you're done
-- **Watch out for** — common mistakes
-- **Tutor recommendations** — opinionated guidance, including where the video gets it wrong
+### Chapter session
+
+Each chapter follows a structured flow:
+
+1. **Prerequisite gate** — Pi checks whether the chapter's tech is familiar given your profile. If not, it runs a short quiz and primes you before starting.
+2. **Theory and quiz** — Pi explains the core concepts for this chapter. Wrong answers are implemented and tested so you see the failure before the correction.
+3. **Test plan** — Pi proposes what to verify, shown in a full-screen dialog. You approve or adjust.
+4. **Test file** — Pi writes the test file. You do not write tests.
+5. **Implementation** — Pi codes through the chapter, narrating each decision. You make design calls when asked; Pi handles all shell commands.
+6. **Done** — Tests pass, chapter is marked complete, next chapter queued.
+
+Pi runs all commands. You only answer questions.
 
 ---
 
-## Five phases
+## Project structure
 
-| Phase | What happens |
-|-------|-------------|
-| **Ingest** | Gemini reads the YouTube URL — transcripts, chapters, stack detection, key concepts |
-| **Grill** | Pi injects a tutor persona and starts a conversation: goals, stack, recommendations |
-| **Scaffold** | Local git repo created at the chosen path |
-| **Build chapters** | Pi generates a `docs/chapter-N.md` lab guide per chapter, narrating decisions in chat |
-| **Finalize** | `POIESIS.md` written with video timestamp links |
+```
+~/.poiesis/
+  user-profile.json         <- your stack and recent projects (built during onboarding)
+```
+
+```
+<project-name>/
+  .poiesis/
+    chapters/
+      .progress.json
+      chapter-N.md
+```
 
 ---
 
 ## Prerequisites
 
 - [`pi`](https://pi.earendil.works) — the coding agent
-- `GEMINI_API_KEY` — free at https://aistudio.google.com/app/apikey
-- `git` configured (`git config --global user.email ...`)
-- `agent-browser` (optional, enables live doc lookups during the session) — `npm i -g agent-browser && agent-browser install`
-
----
-
-## Config
-
-Stored at `~/.poiesis/config.json` — created on first run, no manual setup needed.
-
-```json
-{
-  "state_dir": "~/.poiesis",
-  "llm_model": "gemini-3.5-flash",
-  "editor_cmd": "cursor",
-  "gemini_api_key": "..."
-}
-```
-
-`GEMINI_API_KEY` env var takes priority over the config value.
-
----
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| `GEMINI_API_KEY not set` | `export GEMINI_API_KEY=<key>` or add to `~/.zshrc` |
-| Gemini returns non-JSON | Transient — re-run ingest: `rm ~/.poiesis/builds/<slug>/ingest.json` |
-| `/poiesis build` says no video found | Run `/poiesis <url>` first |
-| Project created in wrong place | `rm ~/.poiesis/builds/<slug>/project-dir.txt` then re-run `/poiesis <url>` |
-| Chapter doc is vague | Switch to `gemini-2.5-pro` in `~/.poiesis/config.json` |
+- `GEMINI_API_KEY` — free at [aistudio.google.com](https://aistudio.google.com/app/apikey)
 
 ---
 
 ## Local development
 
 ```bash
-# Test without publishing — installs from local path globally
+# Install from local path
 pi install /path/to/poiesis/apps/pi-extension
 
-# One-off test without installing
+# Test without installing
 pi -e /path/to/poiesis/apps/pi-extension
 
-# Hot-reload after edits (while pi is running)
+# Hot-reload after edits (inside pi)
 /reload
-
-# Force fresh ingest for a video
-rm ~/.poiesis/builds/<slug>/ingest.json
-
-# Force re-plan (re-run the 3 build questions)
-rm ~/.poiesis/builds/<slug>/plan.json
 ```

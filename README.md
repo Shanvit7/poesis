@@ -30,6 +30,13 @@ Currently ships as a **[pi](https://pi.earendil.works) extension**. See [`apps/p
 
 ---
 
+## Roadmap
+
+- Claude Code plugin
+- Codex plugin
+
+---
+
 ## License
 
 MIT
