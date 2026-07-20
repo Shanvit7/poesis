@@ -33,7 +33,6 @@
     "@google/genai": "^1.0.0",
     "@juicesharp/rpiv-ask-user-question": "^1.20.0"
   },
-  "bundledDependencies": ["@juicesharp/rpiv-ask-user-question"],
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
     "typebox": "*"
