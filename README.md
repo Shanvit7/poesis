@@ -24,16 +24,25 @@ Poiesis watches a YouTube coding tutorial chapter by chapter, writes the code, a
 
 ## Get started
 
-Currently ships as a **[pi](https://pi.earendil.works) extension**. See [`apps/pi-extension/README.md`](./apps/pi-extension/README.md) for setup and usage.
+Currently ships as a **[pi](https://pi.earendil.works) extension**.
 
-**Requires:** `GEMINI_API_KEY` — get one at [aistudio.google.com](https://aistudio.google.com/app/apikey).
+```bash
+pi install npm:@shanvit7/poiesis
+```
+
+Then set your Gemini API key:
+
+```bash
+export GEMINI_API_KEY=your-key-here
+```
+
+Get one free at [aistudio.google.com](https://aistudio.google.com/app/apikey). Full docs: [`apps/pi-extension/README.md`](./apps/pi-extension/README.md).
 
 ---
 
 ## Roadmap
 
 - Claude Code plugin
-- Codex plugin
 
 ---
 

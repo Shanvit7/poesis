@@ -1,4 +1,8 @@
-.pi/
-node_modules/
+# Dev tooling
+promptfooconfig.yaml
+providers/
 bun.lock
 tsconfig.json
+
+# Placeholder files
+**/.gitkeep

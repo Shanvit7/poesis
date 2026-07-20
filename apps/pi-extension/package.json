@@ -20,19 +20,19 @@
     "eval:view": "promptfoo view",
     "eval:ci": "promptfoo eval --ci --no-cache"
   },
-  "files": ["index.ts", "src", "prompts", "skills", "README.md"],
+  "files": ["index.ts", "src", "prompts", "skills", "README.md", "LICENSE"],
   "publishConfig": {
     "access": "public"
   },
   "pi": {
     "extensions": ["./index.ts", "node_modules/@juicesharp/rpiv-ask-user-question/index.ts"],
-    "skills": ["./skills"]
+    "skills": ["./skills"],
+    "prompts": ["./prompts"]
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
-    "@juicesharp/rpiv-ask-user-question": "*"
+    "@juicesharp/rpiv-ask-user-question": "^1.20.0"
   },
-  "bundledDependencies": ["@juicesharp/rpiv-ask-user-question"],
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
     "typebox": "*"
