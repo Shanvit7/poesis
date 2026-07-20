@@ -1,11 +1,22 @@
 "use client"
 
 import { GithubIcon } from "@/components/brand-icons"
-import { GITHUB_URL } from "@/lib/constants"
+import { GITHUB_URL, NPM_URL } from "@/lib/constants"
 import { motion, useReducedMotion } from "framer-motion"
+import { Check, Copy } from "lucide-react"
+import { useState } from "react"
+
+const INSTALL_CMD = "pi install npm:@shanvit7/poiesis"
 
 export const ComingSoon = () => {
   const reduce = useReducedMotion()
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(INSTALL_CMD)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <main className="relative flex min-h-svh flex-col items-center justify-center px-5 py-16 sm:px-10">
@@ -76,8 +87,53 @@ export const ComingSoon = () => {
         {/* Rule */}
         <div aria-hidden className="mt-10 h-px w-10 bg-border" />
 
+        {/* Availability */}
+        <div className="mt-8 flex flex-col gap-5">
+          {/* pi extension — live */}
+          <div className="flex flex-col gap-2.5">
+            <span className="font-mono text-[0.6875rem] text-muted">
+              Currently ships as a{" "}
+              <a
+                href="https://pi.earendil.works"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-fg no-underline transition-opacity hover:opacity-50"
+              >
+                pi
+              </a>{" "}
+              extension
+            </span>
+            <div className="inline-flex items-center gap-3 rounded border border-border bg-fg/[0.03] px-3.5 py-2.5 self-start">
+              <span aria-hidden className="font-mono text-[0.6875rem] text-muted select-none">
+                $
+              </span>
+              <code className="font-mono text-[0.6875rem] text-fg tracking-wide">
+                {INSTALL_CMD}
+              </code>
+              <span aria-hidden className="h-3 w-px bg-border" />
+              <button
+                type="button"
+                onClick={handleCopy}
+                aria-label={copied ? "Copied" : "Copy install command"}
+                className="text-muted transition-colors hover:text-fg"
+              >
+                {copied ? <Check size={11} /> : <Copy size={11} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Claude Code — coming soon */}
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[0.6875rem] text-muted">Claude Code plugin</span>
+            <span aria-hidden className="font-mono text-[0.6875rem] text-border">
+              —
+            </span>
+            <span className="font-mono text-[0.6875rem] text-muted/50">coming soon</span>
+          </div>
+        </div>
+
         {/* Links row */}
-        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
           <a
             href={GITHUB_URL}
             target="_blank"
@@ -90,7 +146,14 @@ export const ComingSoon = () => {
           <span aria-hidden className="font-mono text-[0.6875rem] text-border select-none">
             ·
           </span>
-          <span className="font-mono text-[0.6875rem] text-muted">shipping soon</span>
+          <a
+            href={NPM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[0.6875rem] text-fg no-underline transition-opacity hover:opacity-50"
+          >
+            v0.1.0 on npm
+          </a>
         </div>
       </motion.div>
     </main>
